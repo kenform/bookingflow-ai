@@ -6,14 +6,18 @@ const steps=[['01','Выбор услуги','Клиент выбирает ус
 const cases=[['Салон красоты','Запись на услугу, выбор мастера, напоминание клиенту.'],['Клиника','Первичный вопрос, слот консультации, аккуратный brief для администратора.'],['Студия услуг','Каталог направлений, быстрый выбор и понятный путь до заявки.']];
 
 function App(){
- const[service,setService]=useState('Консультация');const[slot,setSlot]=useState('11:00');const[name,setName]=useState('Анна');const[phone,setPhone]=useState('+7 ••• •••-••-••');
+ const[service,setService]=useState("Консультация");const[slot,setSlot]=useState("11:00");const[name,setName]=useState("Анна");const[phone,setPhone]=useState("+7 ••• •••-••-••");const[copied,setCopied]=useState(false);const[menuOpen,setMenuOpen]=useState(false);
  const brief=useMemo(()=>`BookingFlow AI demo. Клиент: ${name}. Контакт: ${phone}. Услуга: ${service}. Время: ${slot}. Нужна быстрая обратная связь и подтверждение записи.`,[name,phone,service,slot]);
- const copy=async()=>{try{await navigator.clipboard.writeText(brief)}catch{}};
+ const copy=async()=>{try{await navigator.clipboard.writeText(brief);setCopied(true);setTimeout(()=>setCopied(false),1800)}catch{setCopied(false)}};
  return <main className="px-4 py-4 sm:px-6 lg:px-8">
-  <header className="mx-auto flex max-w-7xl items-center justify-between rounded-[1.6rem] border border-line bg-white/85 p-3 shadow-card backdrop-blur">
-   <a href="#" className="flex items-center gap-3 no-underline"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-lg font-black text-mint">BF</span><span><b className="block tracking-[.28em]">BOOKINGFLOW</b><small className="font-bold text-muted">AI-ready booking demo</small></span></a>
-   <nav className="hidden gap-6 text-sm font-black text-muted md:flex"><a href="#services">Услуги</a><a href="#booking">Запись</a><a href="#flow">Процесс</a></nav>
-   <a href="#" onClick={(e)=>e.preventDefault()} className="rounded-2xl bg-ink px-5 py-3 text-sm font-black text-mint no-underline">Открыть демо</a>
+  <header className="sticky top-3 z-50 mx-auto max-w-7xl rounded-[1.6rem] border border-line bg-white/90 p-3 shadow-card backdrop-blur">
+   <div className="flex items-center justify-between gap-3">
+    <a href="#" className="flex min-w-0 items-center gap-3 no-underline"><span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-ink text-lg font-black text-mint">BF</span><span className="min-w-0"><b className="block truncate tracking-[.28em]">BOOKINGFLOW</b><small className="font-bold text-muted">AI-ready booking demo</small></span></a>
+    <nav className="hidden gap-6 text-sm font-black text-muted md:flex"><a href="#services">Услуги</a><a href="#booking">Запись</a><a href="#flow">Процесс</a></nav>
+    <a href="#booking" className="hidden rounded-2xl bg-ink px-5 py-3 text-sm font-black text-mint no-underline md:inline-flex">Открыть демо</a>
+    <button type="button" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Открыть меню" className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-soft text-2xl font-black leading-none text-ink md:hidden">{menuOpen ? "×" : "☰"}</button>
+   </div>
+   {menuOpen&&<div className="mt-3 grid gap-2 rounded-2xl border border-line bg-paper p-3 md:hidden"><a onClick={()=>setMenuOpen(false)} href="#services" className="rounded-xl px-4 py-3 font-black text-muted no-underline">Услуги</a><a onClick={()=>setMenuOpen(false)} href="#booking" className="rounded-xl px-4 py-3 font-black text-muted no-underline">Запись</a><a onClick={()=>setMenuOpen(false)} href="#flow" className="rounded-xl px-4 py-3 font-black text-muted no-underline">Процесс</a><a onClick={()=>setMenuOpen(false)} href="#booking" className="rounded-xl bg-ink px-4 py-3 text-center font-black text-mint no-underline">Открыть демо</a></div>}
   </header>
 
   <section className="mx-auto grid max-w-7xl gap-6 py-10 lg:grid-cols-[1fr_.82fr] lg:py-16">
@@ -43,7 +47,7 @@ function App(){
     <div className="mt-5"><p className="font-black text-muted">Услуга</p><div className="mt-3 flex flex-wrap gap-2">{services.map(x=><button type="button" onClick={()=>setService(x)} className={`rounded-full border px-4 py-2 text-sm font-black ${service===x?'border-ink bg-ink text-mint':'border-line bg-paper text-muted'}`} key={x}>{x}</button>)}</div></div>
     <div className="mt-5"><p className="font-black text-muted">Свободные слоты</p><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">{slots.map(x=><button type="button" onClick={()=>setSlot(x)} className={`rounded-2xl border p-3 text-sm font-black ${slot===x?'border-mint bg-mint text-ink':'border-line bg-paper text-muted'}`} key={x}>{x}</button>)}</div></div>
     <div className="mt-6 rounded-3xl border border-line bg-soft p-5"><p className="text-xs font-black uppercase tracking-[.28em] text-sky">Booking brief</p><p className="mt-3 text-sm leading-7 text-muted">{brief}</p></div>
-    <button className="mt-5 w-full rounded-2xl bg-ink px-6 py-4 font-black text-mint">Скопировать заявку</button>
+    <button className="mt-5 w-full rounded-2xl bg-ink px-6 py-4 font-black text-mint">{copied ? "Заявка скопирована" : "Скопировать заявку"}</button>
    </form>
   </section>
 
@@ -51,7 +55,7 @@ function App(){
 
   <section className="mx-auto max-w-7xl py-10"><div className="grid gap-4 lg:grid-cols-3">{cases.map(([t,d])=><article className="rounded-[1.7rem] border border-line bg-white p-5 shadow-card" key={t}><div className="h-36 rounded-[1.4rem] bg-gradient-to-br from-soft to-white"/><h3 className="mt-5 text-xl font-black">{t}</h3><p className="mt-3 text-sm leading-7 text-muted">{d}</p></article>)}</div></section>
 
-  <section className="mx-auto max-w-7xl pb-16"><div className="rounded-[2rem] bg-ink p-6 text-center text-white shadow-soft sm:p-10"><p className="text-xs font-black uppercase tracking-[.42em] text-mint">Contact placeholder</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Сайт показывает не просто дизайн, а готовый сценарий заявки.</h2><p className="mx-auto mt-4 max-w-2xl text-white/70">Следующий шаг для реального клиента — заменить демо-данные, подключить Telegram/CRM и сделать настоящую отправку заявки.</p><a href="#" onClick={(e)=>{e.preventDefault();copy()}} className="mt-7 inline-flex rounded-2xl bg-mint px-7 py-4 font-black text-ink no-underline">Вернуться к демо-записи</a></div></section>
+  <section className="-mx-4 mt-8 bg-ink px-4 py-14 text-white sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/5 p-6 text-center shadow-soft sm:p-10"><p className="text-xs font-black uppercase tracking-[.42em] text-mint">Contact placeholder</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Сайт показывает не просто дизайн, а готовый сценарий заявки.</h2><p className="mx-auto mt-4 max-w-2xl text-white/70">Следующий шаг для реального клиента — заменить демо-данные, подключить Telegram/CRM и сделать настоящую отправку заявки.</p><a href="#booking" className="mt-7 inline-flex rounded-2xl bg-mint px-7 py-4 font-black text-ink no-underline">Вернуться к демо-записи</a></div></section>
  </main>
 }
 createRoot(document.getElementById('root')!).render(<App/>);
